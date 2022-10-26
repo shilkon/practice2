@@ -31,36 +31,36 @@ fn main() {
    let args = Args::parse();
 
    let mut file = File::open(args.i_file)
-   .expect("can't open the file for reading");
+      .expect("can't open the file for reading");
    let mut reader = BufReader::new(file);
 
    let data: Data = match args.i_format.as_str() {
       "json" => serde_json::from_reader(reader)
-      .expect("can't deserialize an object from file of JSON"),
+         .expect("can't deserialize an object from file of JSON"),
       "yaml" => serde_yaml::from_reader(reader)
-      .expect("can't deserialize an object from file of YAML"),
+         .expect("can't deserialize an object from file of YAML"),
       "ron" => ron::de::from_reader(reader)
-      .expect("can't deserialize an object from file of RON"),
+         .expect("can't deserialize an object from file of RON"),
       "toml" => {
          let mut temp = String::new();
          reader.read_to_string(&mut temp).unwrap();
          toml::de::from_str(temp.as_str())
-         .expect("can't deserialize an object from file of TOML")
+            .expect("can't deserialize an object from file of TOML")
       }
       _ => panic!("invalid input file format")
    };
 
    file = File::create(args.o_file)
-   .expect("can't open the file for writing");
+      .expect("can't open the file for writing");
    match args.o_format.as_str() {
       "json" => serde_json::to_writer_pretty(file, &data)
-      .expect("can't serialize the object as JSON"),
+         .expect("can't serialize the object as JSON"),
       "yaml" => serde_yaml::to_writer(file, &data)
-      .expect("can't serialize the object as YAML"),
+         .expect("can't serialize the object as YAML"),
       "ron" => ron::ser::to_writer(file, &data)
-      .expect("can't serialize the object as RON"),
+         .expect("can't serialize the object as RON"),
       "toml" => write!(file, "{}", toml::to_string(&data)
-      .expect("can't serialize the object as TOML")).unwrap(),
+         .expect("can't serialize the object as TOML")).unwrap(),
       _ => panic!("invalid output file format")
    };
 }
